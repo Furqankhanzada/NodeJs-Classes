@@ -1,27 +1,37 @@
 var express = require('express');
+var path = require('path');
 
-var server = express();
+var app = express();
 
-server.listen(9000);
+app.listen(9000);
 
-server.set('view engine', require('ejs'));
-server.set('views', __dirname + "/views");
-server.use(require('body-parser').urlencoded({extended: true}));
+app.set('view engine', require('ejs'));
+app.set('views', __dirname + "/views");
+app.use(express.static(__dirname + '/public'));
+app.use(require('body-parser').urlencoded({extended: true}));
 
-server.get('/', function(req, res){
-    console.log('root url');
-    res.send('Root url');
+var students = [];
+app.get('/', function(req, res){
+    var filterStudents = [];
+    if(req.query.search){
+        filterStudents = students.filter(function(student){
+            for(var prop in student){
+                if(student[prop].indexOf(req.query.search) != -1){
+                    return student;
+                }
+            }
+        });
+    }
+    res.render('index.ejs', {students: filterStudents.length || req.query.search ? filterStudents : students});
 });
 
-server.get('/home', function(req, res){
-    res.render('index.ejs', {title: "<h1>This is my first project </h1>"});
+app.post('/', function(req, res){
+    if(req.body){
+        students.push(req.body);
+    }
+    res.render('index.ejs', {students: students});
 });
 
-server.get('/studentRegister', function(req, res){
-    res.render('register.ejs', {title: "<h1>This is my first project </h1>"});
-});
-
-server.post('/result', function(req, res){
-    console.log(req.body);
-    res.render('result.ejs', req.body);
+app.get('/register', function(req, res){
+    res.render('register.ejs');
 });
