@@ -22,14 +22,14 @@ app.get('/', function(req, res){
             }
         });
     }
-    res.render('index.ejs', {students: filterStudents.length || req.query.search ? filterStudents : students});
+    res.render('index.ejs', {search: req.query.search || '', students: filterStudents.length || req.query.search ? filterStudents : students});
 });
 
 app.post('/', function(req, res){
     if(req.body){
         students.push(req.body);
     }
-    res.render('index.ejs', {students: students});
+    res.render('index.ejs', {search: req.query.search || '', students: students});
 });
 
 app.get('/register', function(req, res){
